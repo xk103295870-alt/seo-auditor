@@ -1,9 +1,12 @@
 import { SeoReport } from '@/types/seo'
 import { CheckItem } from './CheckItem'
+import { useI18n } from './I18nProvider'
 
 export function TechSeoTab({ report }: { report: SeoReport }) {
+  const { t } = useI18n()
+
   if (!report.techChecks || report.techChecks.length === 0) {
-    return <p className="text-gray-600">深度扫描未包含技术 SEO 数据。</p>
+    return <p className="text-gray-600">{t('noTechData')}</p>
   }
   return (
     <div className="space-y-4">

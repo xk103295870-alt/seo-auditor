@@ -1,12 +1,15 @@
 import { CheckItem as CheckItemType } from '@/types/seo'
-
-const statusMap = {
-  pass: { label: '达标', className: 'bg-green-100 text-green-800' },
-  warn: { label: '警告', className: 'bg-yellow-100 text-yellow-800' },
-  fail: { label: '错误', className: 'bg-red-100 text-red-800' },
-}
+import { useI18n } from './I18nProvider'
 
 export function CheckItem({ item }: { item: CheckItemType }) {
+  const { t } = useI18n()
+
+  const statusMap = {
+    pass: { label: t('pass'), className: 'bg-green-100 text-green-800' },
+    warn: { label: t('warn'), className: 'bg-yellow-100 text-yellow-800' },
+    fail: { label: t('fail'), className: 'bg-red-100 text-red-800' },
+  }
+
   const status = statusMap[item.status]
   return (
     <div className="rounded-lg border border-gray-200 p-4">
@@ -17,8 +20,8 @@ export function CheckItem({ item }: { item: CheckItemType }) {
         </span>
       </div>
       <div className="mb-2 text-sm text-gray-700">
-        <span className="font-medium">当前值：</span>
-        {typeof item.value === 'boolean' ? (item.value ? '是' : '否') : String(item.value)}
+        <span className="font-medium">{t('currentValue')}</span>
+        {typeof item.value === 'boolean' ? (item.value ? 'Yes' : 'No') : String(item.value)}
       </div>
       {item.recommendation && (
         <div className="text-sm text-gray-600">💡 {item.recommendation}</div>

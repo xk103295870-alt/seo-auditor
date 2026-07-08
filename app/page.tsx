@@ -2,14 +2,18 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { UrlInput } from '@/components/UrlInput'
 import { ScanTypeSelector } from '@/components/ScanTypeSelector'
 import { ScanButton } from '@/components/ScanButton'
 import { RecentScans } from '@/components/RecentScans'
+import { LangSwitch } from '@/components/LangSwitch'
 import { ScanType } from '@/types/seo'
 import { isValidUrl } from '@/lib/utils'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function Home() {
+  const { t } = useI18n()
   const [url, setUrl] = useState('')
   const [type, setType] = useState<ScanType>('basic')
   const [loading, setLoading] = useState(false)
@@ -21,7 +25,7 @@ export default function Home() {
     setError('')
 
     if (!isValidUrl(url)) {
-      setError('请输入有效的网址')
+      setError(t('invalidUrl'))
       return
     }
 
@@ -34,7 +38,7 @@ export default function Home() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '扫描失败')
+      if (!res.ok) throw new Error(data.error || t('scanFailed'))
 
       const task = data.task
       const recentsRaw = localStorage.getItem('recent-scans')
@@ -47,7 +51,7 @@ export default function Home() {
 
       router.push(`/report/${task.id}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '扫描失败')
+      setError(err instanceof Error ? err.message : t('scanFailed'))
     } finally {
       setLoading(false)
     }
@@ -56,8 +60,19 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="w-full max-w-xl text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">免费 SEO 网站健康检查</h1>
-        <p className="mb-8 text-lg text-gray-600">输入网址，快速获取 SEO 优化建议</p>
+        <div className="mb-6 flex flex-col items-center">
+          <Image
+            src="/logo.png"
+            alt="W Studio"
+            width={80}
+            height={80}
+            className="mb-3 rounded-2xl"
+          />
+          <LangSwitch />
+        </div>
+
+        <h1 className="mb-4 text-4xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="mb-8 text-lg text-gray-600">{t('subtitle')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <UrlInput value={url} onChange={setUrl} error={error} />

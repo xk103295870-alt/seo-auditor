@@ -1,6 +1,7 @@
 'use client'
 
 import { ScanType } from '@/types/seo'
+import { useI18n } from './I18nProvider'
 
 interface ScanTypeSelectorProps {
   value: ScanType
@@ -8,6 +9,8 @@ interface ScanTypeSelectorProps {
 }
 
 export function ScanTypeSelector({ value, onChange }: ScanTypeSelectorProps) {
+  const { t } = useI18n()
+
   return (
     <div className="flex gap-4">
       <button
@@ -19,8 +22,8 @@ export function ScanTypeSelector({ value, onChange }: ScanTypeSelectorProps) {
             : 'border-gray-300 hover:bg-gray-50'
         }`}
       >
-        <div className="font-semibold">基础扫描</div>
-        <div className="text-sm text-gray-600">实时 · Title、Description、H1 等</div>
+        <div className="font-semibold">{t('basicScan')}</div>
+        <div className="text-sm text-gray-600">{t('basicScanDesc')}</div>
       </button>
       <button
         type="button"
@@ -31,8 +34,8 @@ export function ScanTypeSelector({ value, onChange }: ScanTypeSelectorProps) {
             : 'border-gray-300 hover:bg-gray-50'
         }`}
       >
-        <div className="font-semibold">深度扫描</div>
-        <div className="text-sm text-gray-600">异步 · Lighthouse、死链、SERP</div>
+        <div className="font-semibold">{t('deepScan')}</div>
+        <div className="text-sm text-gray-600">{t('deepScanDesc')}</div>
       </button>
     </div>
   )

@@ -1,10 +1,13 @@
 import { SeoReport } from '@/types/seo'
 import { CheckItem } from './CheckItem'
 import { SerpPreview } from './SerpPreview'
+import { useI18n } from './I18nProvider'
 
 export function GoogleSearchTab({ report }: { report: SeoReport }) {
+  const { t } = useI18n()
+
   if (!report.serpChecks || report.serpChecks.length === 0) {
-    return <p className="text-gray-600">深度扫描未包含 Google 搜索数据。</p>
+    return <p className="text-gray-600">{t('noGoogleData')}</p>
   }
 
   return (
@@ -14,7 +17,7 @@ export function GoogleSearchTab({ report }: { report: SeoReport }) {
       ))}
 
       <div>
-        <h3 className="mb-3 font-semibold">SERP 预览</h3>
+        <h3 className="mb-3 font-semibold">{t('serpPreview')}</h3>
         <div className="space-y-3">
           <SerpPreview
             title="示例标题"

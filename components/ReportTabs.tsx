@@ -1,13 +1,17 @@
 'use client'
 
-const tabs = [
-  { id: 'overview', label: '概览' },
-  { id: 'basic', label: '基础 SEO' },
-  { id: 'tech', label: '技术 SEO' },
-  { id: 'google', label: 'Google 搜索' },
-]
+import { useI18n } from './I18nProvider'
 
 export function ReportTabs({ active, onChange }: { active: string; onChange: (id: string) => void }) {
+  const { t } = useI18n()
+
+  const tabs = [
+    { id: 'overview', label: t('overview') },
+    { id: 'basic', label: t('basicSeo') },
+    { id: 'tech', label: t('techSeo') },
+    { id: 'google', label: t('googleSearch') },
+  ]
+
   return (
     <div className="border-b border-gray-200">
       <nav className="flex space-x-8">

@@ -8,9 +8,12 @@ import { OverviewTab } from '@/components/OverviewTab'
 import { BasicSeoTab } from '@/components/BasicSeoTab'
 import { TechSeoTab } from '@/components/TechSeoTab'
 import { GoogleSearchTab } from '@/components/GoogleSearchTab'
+import { LangSwitch } from '@/components/LangSwitch'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function ReportPage() {
   const { id } = useParams<{ id: string }>()
+  const { t } = useI18n()
   const [task, setTask] = useState<ScanTask | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -23,10 +26,10 @@ export default function ReportPage() {
       try {
         const res = await fetch(`/api/scan/${id}`)
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error || '加载失败')
+        if (!res.ok) throw new Error(data.error || t('loading'))
         if (!cancelled) setTask(data.task)
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : '加载失败')
+        if (!cancelled) setError(err instanceof Error ? err.message : t('loading'))
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -34,23 +37,26 @@ export default function ReportPage() {
 
     load()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, t])
 
-  if (loading) return <div className="p-8 text-center">加载中...</div>
+  if (loading) return <div className="p-8 text-center">{t('loading')}...</div>
   if (error) return <div className="p-8 text-center text-red-600">{error}</div>
-  if (!task) return <div className="p-8 text-center">未找到任务</div>
-  if (!task.result) return <div className="p-8 text-center">扫描尚未完成，请稍后刷新。</div>
+  if (!task) return <div className="p-8 text-center">{t('taskNotFound')}</div>
+  if (!task.result) return <div className="p-8 text-center">{t('scanNotComplete')}</div>
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">SEO 审核报告</h1>
-        <p className="text-gray-600">{task.result.url}</p>
-        <div className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm">
-          {task.type === 'basic' ? '基础扫描' : '深度扫描'}
-          <span className="mx-2">·</span>
-          {task.status === 'completed' ? '已完成' : task.status}
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{t('reportTitle')}</h1>
+          <p className="text-gray-600">{task.result.url}</p>
+          <div className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm">
+            {task.type === 'basic' ? t('basic') : t('deep')}
+            <span className="mx-2">·</span>
+            {task.status === 'completed' ? t('completed') : task.status}
+          </div>
         </div>
+        <LangSwitch />
       </div>
 
       <ReportTabs active={activeTab} onChange={setActiveTab} />
