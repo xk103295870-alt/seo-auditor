@@ -32,15 +32,25 @@ export async function runPageSpeed(url: string, apiKey?: string): Promise<PageSp
   const key = apiKey || process.env.GOOGLE_PAGESPEED_API_KEY
   const apiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed')
   apiUrl.searchParams.set('url', url)
-  apiUrl.searchParams.set('strategy', 'mobile')
+  apiUrl.searchParams.set('strategy', 'desktop')
   apiUrl.searchParams.set('category', 'PERFORMANCE')
   apiUrl.searchParams.set('category', 'ACCESSIBILITY')
   apiUrl.searchParams.set('category', 'BEST_PRACTICES')
   apiUrl.searchParams.set('category', 'SEO')
+  apiUrl.searchParams.set('locale', 'en')
   if (key) apiUrl.searchParams.set('key', key)
 
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 25000)
+
   try {
-    const res = await fetch(apiUrl.toString())
+    console.log('[PageSpeed] Requesting', { url, strategy: 'desktop' })
+    const start = Date.now()
+    const res = await fetch(apiUrl.toString(), { signal: controller.signal })
+    clearTimeout(timeout)
+    const duration = Date.now() - start
+    console.log('[PageSpeed] Response', { url, status: res.status, duration })
+
     if (!res.ok) {
       const body = await res.text().catch(() => '')
       const message = `PageSpeed API error: ${res.status} ${body.slice(0, 200)}`
@@ -62,6 +72,7 @@ export async function runPageSpeed(url: string, apiKey?: string): Promise<PageSp
       cls: metrics.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile || null,
     }
   } catch (err) {
+    clearTimeout(timeout)
     const message = err instanceof Error ? err.message : 'PageSpeed fetch failed'
     console.error('[PageSpeed Fetch Error]', message)
     return { ...emptyResult, error: message }
