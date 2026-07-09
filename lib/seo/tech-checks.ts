@@ -9,6 +9,16 @@ export function runTechChecks(
 ): CheckItem[] {
   const checks: CheckItem[] = []
 
+  if (pageSpeed.error) {
+    checks.push({
+      id: 'lighthouse-error',
+      name: 'Lighthouse API 调用失败',
+      status: 'fail',
+      value: pageSpeed.error,
+      recommendation: '请检查 GOOGLE_PAGESPEED_API_KEY 是否正确，或稍后重试。',
+    })
+  }
+
   const scoreLabel = (score: number | null) =>
     score === null ? '无数据' : `${score}`
 

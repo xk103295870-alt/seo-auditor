@@ -88,15 +88,7 @@ export async function runScan(url: string, type: ScanType): Promise<SeoReport> {
 
   if (type === 'deep') {
     const [pageSpeed, deadLinks] = await Promise.all([
-      runPageSpeed(finalUrl).catch(() => ({
-        performance: null,
-        accessibility: null,
-        bestPractices: null,
-        seo: null,
-        lcp: null,
-        inp: null,
-        cls: null,
-      })),
+      runPageSpeed(finalUrl),
       checkDeadLinks(html, finalUrl).catch(() => 0),
     ])
 

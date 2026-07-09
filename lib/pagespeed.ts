@@ -15,6 +15,17 @@ export interface PageSpeedResult {
   lcp: number | null
   inp: number | null
   cls: number | null
+  error?: string
+}
+
+const emptyResult: PageSpeedResult = {
+  performance: null,
+  accessibility: null,
+  bestPractices: null,
+  seo: null,
+  lcp: null,
+  inp: null,
+  cls: null,
 }
 
 export async function runPageSpeed(url: string, apiKey?: string): Promise<PageSpeedResult> {
@@ -28,25 +39,32 @@ export async function runPageSpeed(url: string, apiKey?: string): Promise<PageSp
   apiUrl.searchParams.set('category', 'SEO')
   if (key) apiUrl.searchParams.set('key', key)
 
-  const res = await fetch(apiUrl.toString())
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    console.error('[PageSpeed API Error]', res.status, body)
-    throw new Error(`PageSpeed API error: ${res.status} ${body.slice(0, 200)}`)
-  }
-  const data: PageSpeedResponse = await res.json()
+  try {
+    const res = await fetch(apiUrl.toString())
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
+      const message = `PageSpeed API error: ${res.status} ${body.slice(0, 200)}`
+      console.error('[PageSpeed API Error]', res.status, body)
+      return { ...emptyResult, error: message }
+    }
+    const data: PageSpeedResponse = await res.json()
 
-  const categories = data.lighthouseResult?.categories || {}
-  const metrics = data.loadingExperience?.metrics || {}
+    const categories = data.lighthouseResult?.categories || {}
+    const metrics = data.loadingExperience?.metrics || {}
 
-  return {
-    performance: toScore(categories.PERFORMANCE?.score),
-    accessibility: toScore(categories.ACCESSIBILITY?.score),
-    bestPractices: toScore(categories.BEST_PRACTICES?.score),
-    seo: toScore(categories.SEO?.score),
-    lcp: metrics.LARGEST_CONTENTFUL_PAINT_MS?.percentile || null,
-    inp: metrics.INTERACTION_TO_NEXT_PAINT?.percentile || null,
-    cls: metrics.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile || null,
+    return {
+      performance: toScore(categories.PERFORMANCE?.score),
+      accessibility: toScore(categories.ACCESSIBILITY?.score),
+      bestPractices: toScore(categories.BEST_PRACTICES?.score),
+      seo: toScore(categories.SEO?.score),
+      lcp: metrics.LARGEST_CONTENTFUL_PAINT_MS?.percentile || null,
+      inp: metrics.INTERACTION_TO_NEXT_PAINT?.percentile || null,
+      cls: metrics.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile || null,
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'PageSpeed fetch failed'
+    console.error('[PageSpeed Fetch Error]', message)
+    return { ...emptyResult, error: message }
   }
 }
 
