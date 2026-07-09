@@ -12,6 +12,7 @@ interface I18nContextType {
   t: (key: TranslationKey) => string
   checkName: (id: string) => string
   checkRecommendation: (id: string) => string | undefined
+  checkValue: (id: string, value: string | number | boolean) => string
 }
 
 const translations = {
@@ -215,6 +216,33 @@ const checkRecommendations: Record<Lang, Record<string, string>> = {
   },
 }
 
+const valueLabels: Record<Lang, Record<string, string>> = {
+  zh: {
+    '无数据': '无数据',
+    '已设置': '已设置',
+    '未设置': '未设置',
+    '未启用': '未启用',
+    '已启用': '已启用',
+    '缺失 Alt': '缺失 Alt',
+    '个': '个',
+    '次': '次',
+    'Yes': '是',
+    'No': '否',
+  },
+  en: {
+    '无数据': 'No data',
+    '已设置': 'Set',
+    '未设置': 'Not set',
+    '未启用': 'Not enabled',
+    '已启用': 'Enabled',
+    '缺失 Alt': 'missing alt',
+    '个': '',
+    '次': '',
+    'Yes': 'Yes',
+    'No': 'No',
+  },
+}
+
 const I18nContext = createContext<I18nContextType | null>(null)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -239,12 +267,27 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const t = (key: TranslationKey) => translations[lang][key]
 
+  const checkValue = (id: string, value: string | number | boolean) => {
+    if (typeof value === 'boolean') return value ? valueLabels[lang]['Yes'] : valueLabels[lang]['No']
+    const str = String(value)
+    // 替换常见状态词
+    return str
+      .replace('无数据', valueLabels[lang]['无数据'])
+      .replace('已设置', valueLabels[lang]['已设置'])
+      .replace('未设置', valueLabels[lang]['未设置'])
+      .replace('已启用', valueLabels[lang]['已启用'])
+      .replace('未启用', valueLabels[lang]['未启用'])
+      .replace('缺失 Alt', valueLabels[lang]['缺失 Alt'])
+      .replace(/(\d+)\s*个/, (match, num) => lang === 'en' ? num : match)
+      .replace(/(\d+)\s*次/, (match, num) => lang === 'en' ? num : match)
+  }
+
   const checkName = (id: string) => checkNames[lang][id] || id
 
   const checkRecommendation = (id: string) => checkRecommendations[lang][id]
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, checkName, checkRecommendation }}>
+    <I18nContext.Provider value={{ lang, setLang, t, checkName, checkRecommendation, checkValue }}>
       {children}
     </I18nContext.Provider>
   )

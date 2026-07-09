@@ -2,7 +2,7 @@ import { CheckItem as CheckItemType } from '@/types/seo'
 import { useI18n } from './I18nProvider'
 
 export function CheckItem({ item }: { item: CheckItemType }) {
-  const { t, checkName, checkRecommendation } = useI18n()
+  const { t, checkName, checkRecommendation, checkValue } = useI18n()
 
   const statusMap = {
     pass: { label: t('pass'), className: 'bg-green-100 text-green-800' },
@@ -13,6 +13,7 @@ export function CheckItem({ item }: { item: CheckItemType }) {
   const status = statusMap[item.status]
   const name = checkName(item.id)
   const recommendation = checkRecommendation(item.id)
+  const value = checkValue(item.id, item.value)
 
   return (
     <div className="rounded-lg border border-gray-200 p-4">
@@ -24,7 +25,7 @@ export function CheckItem({ item }: { item: CheckItemType }) {
       </div>
       <div className="mb-2 text-sm text-gray-700">
         <span className="font-medium">{t('currentValue')}</span>
-        {typeof item.value === 'boolean' ? (item.value ? 'Yes' : 'No') : String(item.value)}
+        {value}
       </div>
       {recommendation && (
         <div className="text-sm text-gray-600">💡 {recommendation}</div>
