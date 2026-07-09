@@ -10,11 +10,13 @@
     "test": "jest"
   },
   "dependencies": {
+    "bullmq": "^5.8.3",
     "cheerio": "^1.0.0-rc.12",
+    "ioredis": "^5.4.1",
     "next": "14.2.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "redis": "^4.6.15",
+    "redis": "^5.0.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
