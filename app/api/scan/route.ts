@@ -39,11 +39,7 @@ export async function POST(req: NextRequest) {
       { jobId: id, attempts: 2, backoff: { type: 'fixed', delay: 5000 } }
     )
 
-    // 异步触发 worker 消费，不等待结果
-    const workerUrl = new URL('/api/worker', req.url)
-    fetch(workerUrl.toString(), { method: 'POST' }).catch(() => {
-      // 触发失败不影响任务入队，worker 还可由 Cron 兜底
-    })
+    console.log('[Scan API] Task enqueued', { id, url, type: scanType })
 
     return NextResponse.json({ task: initialTask }, { status: 200 })
   } catch (err) {
