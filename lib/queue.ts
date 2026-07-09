@@ -1,4 +1,4 @@
-import { Queue, Worker } from 'bullmq'
+import { Queue, Job } from 'bullmq'
 
 const redisUrl = process.env.REDIS_URL || process.env.KV_URL
 
@@ -18,9 +18,10 @@ export const scanQueue = new Queue('seo-scan', {
   },
 })
 
-export function createScanWorker(processor: (job: any) => Promise<any>) {
-  return new Worker('seo-scan', processor, {
-    connection,
-    autorun: true,
-  })
+export async function getPendingJobs(limit = 5): Promise<Job[]> {
+  return scanQueue.getJobs(['waiting', 'delayed'], 0, limit - 1, true)
+}
+
+export async function closeQueue(): Promise<void> {
+  await scanQueue.close()
 }

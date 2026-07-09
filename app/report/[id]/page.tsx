@@ -22,13 +22,19 @@ export default function ReportPage() {
 
   useEffect(() => {
     let cancelled = false
+    let timer: NodeJS.Timeout | null = null
 
     async function load() {
       try {
         const res = await fetch(`/api/scan/${id}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || t('loading'))
-        if (!cancelled) setTask(data.task)
+        if (!cancelled) {
+          setTask(data.task)
+          if (data.task && data.task.status !== 'completed' && data.task.status !== 'failed') {
+            timer = setTimeout(load, 3000)
+          }
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : t('loading'))
       } finally {
@@ -37,7 +43,10 @@ export default function ReportPage() {
     }
 
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
+    }
   }, [id, t])
 
   if (loading) return <div className="p-8 text-center">{t('loading')}...</div>

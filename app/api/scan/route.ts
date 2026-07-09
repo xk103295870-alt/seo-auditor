@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ScanTask, ScanType } from '@/types/seo'
 import { isValidUrl } from '@/lib/utils'
 import { setTask } from '@/lib/kv'
-import { runScan } from '@/lib/seo/scanner'
+import { scanQueue } from '@/lib/queue'
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,20 +33,19 @@ export async function POST(req: NextRequest) {
 
     await setTask(id, initialTask)
 
-    // 注意：Next.js API Route 中直接 await 执行扫描，deep 扫描可能超时
-    // MVP 阶段先同步执行，后续如需长时间任务可改为队列
-    const result = await runScan(url, scanType)
+    await scanQueue.add(
+      'scan',
+      { id, url, type: scanType },
+      { jobId: id, attempts: 2, backoff: { type: 'fixed', delay: 5000 } }
+    )
 
-    const completedTask: ScanTask = {
-      ...initialTask,
-      status: 'completed',
-      updatedAt: new Date().toISOString(),
-      result,
-    }
+    // 异步触发 worker 消费，不等待结果
+    const workerUrl = new URL('/api/worker', req.url)
+    fetch(workerUrl.toString(), { method: 'POST' }).catch(() => {
+      // 触发失败不影响任务入队，worker 还可由 Cron 兜底
+    })
 
-    await setTask(id, completedTask)
-
-    return NextResponse.json({ task: completedTask }, { status: 200 })
+    return NextResponse.json({ task: initialTask }, { status: 200 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })
