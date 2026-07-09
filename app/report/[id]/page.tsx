@@ -10,6 +10,7 @@ import { TechSeoTab } from '@/components/TechSeoTab'
 import { GoogleSearchTab } from '@/components/GoogleSearchTab'
 import { LangSwitch } from '@/components/LangSwitch'
 import { useI18n } from '@/components/I18nProvider'
+import Link from 'next/link'
 
 export default function ReportPage() {
   const { id } = useParams<{ id: string }>()
@@ -48,6 +49,12 @@ export default function ReportPage() {
     <main className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex items-start justify-between">
         <div>
+          <Link
+            href="/"
+            className="mb-2 inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+          >
+            ← {t('backToHome')}
+          </Link>
           <h1 className="text-3xl font-bold">{t('reportTitle')}</h1>
           <p className="text-gray-600">{task.result.url}</p>
           <div className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm">

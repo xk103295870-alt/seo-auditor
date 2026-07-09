@@ -51,6 +51,7 @@ const translations = {
     serpPreview: 'SERP 预览',
     noTechData: '深度扫描未包含技术 SEO 数据。',
     noGoogleData: '深度扫描未包含 Google 搜索数据。',
+    backToHome: '返回首页',
   },
   en: {
     title: 'Free SEO Website Health Check',
@@ -88,6 +89,7 @@ const translations = {
     serpPreview: 'SERP Preview',
     noTechData: 'Deep scan did not include technical SEO data.',
     noGoogleData: 'Deep scan did not include Google search data.',
+    backToHome: 'Back to Home',
   },
 } as const
 
