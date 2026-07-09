@@ -58,7 +58,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4">
+    <main className="flex min-h-screen flex-col items-center justify-start px-4 pt-24 md:pt-32">
       <div className="w-full max-w-xl text-center">
         <div className="mb-6 flex flex-col items-center">
           <Image
