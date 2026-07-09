@@ -30,7 +30,9 @@ export async function runPageSpeed(url: string, apiKey?: string): Promise<PageSp
 
   const res = await fetch(apiUrl.toString())
   if (!res.ok) {
-    throw new Error(`PageSpeed API error: ${res.status}`)
+    const body = await res.text().catch(() => '')
+    console.error('[PageSpeed API Error]', res.status, body)
+    throw new Error(`PageSpeed API error: ${res.status} ${body.slice(0, 200)}`)
   }
   const data: PageSpeedResponse = await res.json()
 
