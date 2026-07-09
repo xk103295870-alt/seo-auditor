@@ -4,10 +4,14 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 type Lang = 'zh' | 'en'
 
+type TranslationKey = keyof typeof translations['zh']
+
 interface I18nContextType {
   lang: Lang
   setLang: (lang: Lang) => void
-  t: (key: keyof typeof translations['zh']) => string
+  t: (key: TranslationKey) => string
+  checkName: (id: string) => string
+  checkRecommendation: (id: string) => string | undefined
 }
 
 const translations = {
@@ -87,6 +91,128 @@ const translations = {
   },
 } as const
 
+const checkNames: Record<Lang, Record<string, string>> = {
+  zh: {
+    'title-exists': 'Title 标签存在',
+    'title-length': 'Title 长度适中',
+    'description-exists': 'Meta Description 存在',
+    'description-length': 'Meta Description 长度适中',
+    'h1-unique': 'H1 标签唯一',
+    'heading-structure': '标题层级合理',
+    'image-alt': '图片 Alt 属性',
+    'canonical': 'Canonical 标签',
+    'robots-indexable': '允许搜索引擎索引',
+    'open-graph': 'Open Graph 标签',
+    'twitter-card': 'Twitter Card 标签',
+    'json-ld': 'JSON-LD Schema',
+    'https': 'HTTPS',
+    'url-canonicalization': 'URL 规范化',
+    'redirect-count': '重定向次数',
+    'lighthouse-performance': 'Lighthouse Performance',
+    'lighthouse-accessibility': 'Lighthouse Accessibility',
+    'lighthouse-best-practices': 'Lighthouse Best Practices',
+    'lighthouse-seo': 'Lighthouse SEO',
+    'lcp': 'LCP（最大内容绘制）',
+    'inp': 'INP（交互到下一次绘制）',
+    'cls': 'CLS（累积布局偏移）',
+    'viewport': '移动端 Viewport',
+    'dead-links': '首页死链数量',
+    'redirect-chain': '重定向链长度',
+    'google-index': 'Google 收录估算',
+    'serp-preview': 'SERP 前 10 结果',
+  },
+  en: {
+    'title-exists': 'Title Tag Exists',
+    'title-length': 'Title Length Optimal',
+    'description-exists': 'Meta Description Exists',
+    'description-length': 'Meta Description Length Optimal',
+    'h1-unique': 'H1 Tag Unique',
+    'heading-structure': 'Heading Structure',
+    'image-alt': 'Image Alt Attributes',
+    'canonical': 'Canonical Tag',
+    'robots-indexable': 'Indexable by Search Engines',
+    'open-graph': 'Open Graph Tags',
+    'twitter-card': 'Twitter Card Tags',
+    'json-ld': 'JSON-LD Schema',
+    'https': 'HTTPS',
+    'url-canonicalization': 'URL Canonicalization',
+    'redirect-count': 'Redirect Count',
+    'lighthouse-performance': 'Lighthouse Performance',
+    'lighthouse-accessibility': 'Lighthouse Accessibility',
+    'lighthouse-best-practices': 'Lighthouse Best Practices',
+    'lighthouse-seo': 'Lighthouse SEO',
+    'lcp': 'LCP (Largest Contentful Paint)',
+    'inp': 'INP (Interaction to Next Paint)',
+    'cls': 'CLS (Cumulative Layout Shift)',
+    'viewport': 'Mobile Viewport',
+    'dead-links': 'Dead Links on Homepage',
+    'redirect-chain': 'Redirect Chain Length',
+    'google-index': 'Google Index Estimate',
+    'serp-preview': 'SERP Top 10 Results',
+  },
+}
+
+const checkRecommendations: Record<Lang, Record<string, string>> = {
+  zh: {
+    'title-exists': '请为页面添加 <title> 标签。',
+    'title-length': '建议 Title 控制在 60 个字符以内。',
+    'description-exists': '请添加 meta description。',
+    'description-length': '建议 Meta Description 控制在 50~160 个字符之间。',
+    'h1-unique': '建议每页只使用一个 H1 标签。',
+    'heading-structure': '建议至少包含 H2 副标题以形成清晰层级。',
+    'image-alt': '建议为所有图片添加描述性 alt 属性。',
+    'canonical': '建议设置 canonical 标签避免重复内容问题。',
+    'robots-indexable': '当前页面设置了 noindex，搜索引擎不会收录。',
+    'open-graph': '建议设置 og:title、og:description 和 og:image。',
+    'twitter-card': '建议设置 Twitter Card 标签。',
+    'json-ld': '建议使用 JSON-LD 标记结构化数据。',
+    'https': '请使用 HTTPS 保障网站安全。',
+    'url-canonicalization': '建议 URL 简短、可读，避免过多参数。',
+    'redirect-count': '建议减少重定向次数，最好不超过 1 次。',
+    'lighthouse-performance': '建议性能分数达到 90 以上。',
+    'lighthouse-accessibility': '建议可访问性分数达到 90 以上。',
+    'lighthouse-best-practices': '建议最佳实践分数达到 90 以上。',
+    'lighthouse-seo': '建议 SEO 分数达到 90 以上。',
+    'lcp': '建议 LCP 不超过 2.5 秒。',
+    'inp': '建议 INP 不超过 200ms。',
+    'cls': '建议 CLS 不超过 0.1。',
+    'viewport': '请设置 <meta name="viewport"> 以支持移动端。',
+    'dead-links': '建议修复所有死链。',
+    'redirect-chain': '建议重定向链不超过 1 次。',
+    'google-index': '建议通过优质内容和站点地图提升收录。',
+    'serp-preview': 'SERP 数据获取失败，可能受 Google 反爬限制。',
+  },
+  en: {
+    'title-exists': 'Please add a <title> tag to the page.',
+    'title-length': 'Keep the title under 60 characters.',
+    'description-exists': 'Please add a meta description.',
+    'description-length': 'Keep meta description between 50 and 160 characters.',
+    'h1-unique': 'Use only one H1 tag per page.',
+    'heading-structure': 'Include at least H2 subheadings for clear structure.',
+    'image-alt': 'Add descriptive alt attributes to all images.',
+    'canonical': 'Set a canonical tag to avoid duplicate content issues.',
+    'robots-indexable': 'This page has noindex set, search engines will not index it.',
+    'open-graph': 'Set og:title, og:description, and og:image.',
+    'twitter-card': 'Set Twitter Card tags.',
+    'json-ld': 'Use JSON-LD to mark up structured data.',
+    'https': 'Use HTTPS to secure your website.',
+    'url-canonicalization': 'Keep URLs short, readable, and avoid excessive parameters.',
+    'redirect-count': 'Reduce redirects, ideally to no more than 1.',
+    'lighthouse-performance': 'Aim for a performance score of 90 or above.',
+    'lighthouse-accessibility': 'Aim for an accessibility score of 90 or above.',
+    'lighthouse-best-practices': 'Aim for a best practices score of 90 or above.',
+    'lighthouse-seo': 'Aim for an SEO score of 90 or above.',
+    'lcp': 'LCP should be under 2.5 seconds.',
+    'inp': 'INP should be under 200ms.',
+    'cls': 'CLS should be under 0.1.',
+    'viewport': 'Set <meta name="viewport"> for mobile support.',
+    'dead-links': 'Fix all dead links.',
+    'redirect-chain': 'Keep redirect chains to no more than 1.',
+    'google-index': 'Improve indexing with quality content and a sitemap.',
+    'serp-preview': 'SERP data unavailable, possibly due to Google anti-scraping.',
+  },
+}
+
 const I18nContext = createContext<I18nContextType | null>(null)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -109,10 +235,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const t = (key: keyof typeof translations['zh']) => translations[lang][key]
+  const t = (key: TranslationKey) => translations[lang][key]
+
+  const checkName = (id: string) => checkNames[lang][id] || id
+
+  const checkRecommendation = (id: string) => checkRecommendations[lang][id]
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t }}>
+    <I18nContext.Provider value={{ lang, setLang, t, checkName, checkRecommendation }}>
       {children}
     </I18nContext.Provider>
   )
