@@ -22,9 +22,23 @@ export function RecentScans() {
 
   if (recents.length === 0) return null
 
+  const clear = () => {
+    localStorage.removeItem('recent-scans')
+    setRecents([])
+  }
+
   return (
     <div className="mt-8">
-      <h3 className="mb-3 text-lg font-semibold">{t('recentScans')}</h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">{t('recentScans')}</h3>
+        <button
+          type="button"
+          onClick={clear}
+          className="text-sm text-gray-500 hover:text-red-600"
+        >
+          {t('clearRecentScans')}
+        </button>
+      </div>
       <ul className="space-y-2">
         {recents.map((scan) => (
           <li key={scan.id}>
