@@ -27,15 +27,11 @@ export function ScanTypeSelector({ value, onChange }: ScanTypeSelectorProps) {
       </button>
       <button
         type="button"
-        onClick={() => onChange('deep')}
-        className={`flex-1 rounded-lg border px-4 py-3 text-left ${
-          value === 'deep'
-            ? 'border-blue-500 bg-blue-50 text-blue-700'
-            : 'border-gray-300 hover:bg-gray-50'
-        }`}
+        disabled
+        className="flex-1 cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-left opacity-60"
       >
         <div className="font-semibold">{t('deepScan')}</div>
-        <div className="text-sm text-gray-600">{t('deepScanDesc')}</div>
+        <div className="text-sm text-gray-500">{t('deepScanDisabledDesc')}</div>
       </button>
     </div>
   )
